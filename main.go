@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	logLevel         = getEnv("TCP_PROXY_LOG_LEVEL", "INFO")
-	eventsServerAddr = getEnv("EVENTS_SERVER_ADDR", "")
-	addr             = getEnv("TCP_PROXY_ADDR", "")
+	logLevel         = getEnv("3C_LOG_LEVEL", "INFO")
+	eventsServerAddr = getEnv("3C_EVENTS_SERVER_ADDR", "")
+	addr             = getEnv("3C_TCP_PROXY_ADDR", "")
 
 	pingInterval = 5 * time.Second
 	pingMessage  = []byte("PING\r\n")
