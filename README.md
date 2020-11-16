@@ -9,7 +9,7 @@ This is a simple proxy that exposes the application events from the 3CPlus V2 di
 Clone the repository, build and run:
 
 ```
-go build *.go
+go build .
 
 3C_PROXY_ADDR=":9090" \
 	3C_LOG_LEVEL=error \
