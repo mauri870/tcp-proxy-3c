@@ -11,9 +11,9 @@ Clone the repository, build and run:
 ```
 go build .
 
-3C_PROXY_ADDR=":9090" \
-	3C_LOG_LEVEL=error \
-	3C_EVENTS_SERVER_ADDR="events.3c.fluxoti.com" \
+TC_TCP_PROXY_ADDR=":9090" \
+	TC_LOG_LEVEL=error \
+	TC_EVENTS_SERVER_ADDR="events.3c.fluxoti.com" \
 	./tcp-proxy-3c
 ```
 
