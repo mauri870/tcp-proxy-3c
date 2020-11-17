@@ -18,7 +18,7 @@ var (
 	addr             = getEnv("TC_TCP_PROXY_ADDR", ":9090")
 
 	pingInterval = 5 * time.Second
-	pingMessage  = []byte("PING\r\n")
+	pingMessage  = []byte("PING\n")
 )
 
 func init() {
@@ -80,7 +80,7 @@ func handleConnection(c net.Conn) {
 		case data := <-streaming:
 			buf.Reset()
 			buf.Write(data)
-			buf.WriteString("\r\n")
+			buf.WriteString("\n")
 			c.Write(buf.Bytes())
 		case <-ticker.C:
 			_, err := c.Write(pingMessage)
