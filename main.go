@@ -35,6 +35,9 @@ func main() {
 		return
 	}
 
+	log.Infof("TCP server started on address: %s", addr)
+	log.Infof("3C Events server address: %s", eventsServerAddr)
+
 	for {
 		c, err := listener.Accept()
 		if err != nil {
