@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"net"
 	"net/url"
 	"os"
@@ -49,43 +50,46 @@ func main() {
 }
 
 func handleConnection(c net.Conn) {
+	defer c.Close()
+
 	log.Debugf("Handling conn from %s\n", c.RemoteAddr().String())
+
+	token, err := bufio.NewReader(c).ReadString('\n')
+	if err != nil {
+		// If the client does not provide a token then bail out
+		log.Error(err)
+		return
+	}
+	token = strings.TrimSpace(string(token))
+
+	ws, err := setupWsStream(token)
+	if err != nil {
+		log.Error(err)
+		return
+	}
+
+	streaming := ws.Start()
+	defer ws.Stop()
+
+	ticker := time.NewTicker(pingInterval)
+	defer ticker.Stop()
+
+	var buf bytes.Buffer
 	for {
-		token, err := bufio.NewReader(c).ReadString('\n')
-		if err != nil {
-			// If the client does not provide a token then bail out
-			log.Error(err)
-			break
-		}
-		token = strings.TrimSpace(string(token))
-
-		ws, err := setupWsStream(token)
-		if err != nil {
-			log.Error(err)
-			break
-		}
-
-		streaming := ws.Start()
-		defer ws.Stop()
-
-		ticker := time.NewTicker(pingInterval)
-		defer ticker.Stop()
-
-		for {
-			select {
-			case data := <-streaming:
-				data = append(data, []byte("\r\n")...)
-				c.Write(data)
-			case <-ticker.C:
-				_, err := c.Write(pingMessage)
-				if err != nil {
-					log.Error(err)
-					break
-				}
+		select {
+		case data := <-streaming:
+			buf.Reset()
+			buf.Write(data)
+			buf.WriteString("\r\n")
+			c.Write(buf.Bytes())
+		case <-ticker.C:
+			_, err := c.Write(pingMessage)
+			if err != nil {
+				log.Error(err)
+				break
 			}
 		}
 	}
-	c.Close()
 }
 
 func setupWsStream(token string) (EventStream, error) {
